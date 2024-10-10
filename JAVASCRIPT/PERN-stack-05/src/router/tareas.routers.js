@@ -1,4 +1,4 @@
-import Router from "express-promise-router";
+import {Router} from "express";
 import {listarTareas, listarTarea, crearTareas, actualizarTareas, eliminarTareas, } from "../controllers/tareas.controllers.js"
 
 const router = Router();

@@ -1,22 +1,3 @@
-// Clase Avatar para encapsular las propiedades de los personajes
-class Avatar {
-    constructor(nombre, imagen, poder) {
-        this.nombre = nombre;
-        this.imagen = imagen;
-        this.poder = poder;
-    }
-}
-
-// Instancias de personajes
-let zuko = new Avatar('Zuko', './imagenes/Zuko.png', 5);
-let katara = new Avatar('Katara', './imagenes/Katara.png', 4);
-let aang = new Avatar('Aang', './imagenes/Aang.png', 6);
-let toph = new Avatar('Toph', './imagenes/Toph.png', 5);
-
-// Arreglo que almacena los personajes
-let avatares = [];
-avatares.push(zuko, katara, aang, toph);
-
 // Objeto para encapsular el estado y la lógica del juego
 const juego = {
     ataqueJugador: '', // Almacena el ataque seleccionado por el jugador
@@ -29,6 +10,7 @@ const juego = {
     iniciar() {
         this.ocultarSecciones(); // Oculta secciones que no se deben mostrar al inicio
         this.configurarEventos(); // Configura los eventos de los botones
+        this.mostrarMensajePersonalizado();
     },
 
     // Oculta las secciones del juego
@@ -64,6 +46,22 @@ const juego = {
         document.getElementById('seleccionar-personaje').style.display = 'block';
     },
 
+    // Método para mostrar mensaje personalizado al pasar el mouse sobre los personajes
+    mostrarMensajePersonalizado() {
+        const personajes = document.querySelectorAll('.personaje-imagen');
+        const mensajeContenedor = document.getElementById('mensaje-personalizado');
+
+        personajes.forEach(personaje => {
+            personaje.addEventListener('mouseover', () => {
+                mensajeContenedor.textContent = personaje.getAttribute('data-mensaje');
+            });
+
+            personaje.addEventListener('mouseout', () => {
+                mensajeContenedor.textContent = '';
+            });
+        });
+    },
+
     // Selecciona el personaje del jugador y el enemigo
     seleccionarPersonajeJugador() {
         const personaje = this.obtenerPersonajeSeleccionado();
@@ -72,13 +70,13 @@ const juego = {
             return;
         }
 
-        document.getElementById('personaje-jugador').innerHTML = personaje.nombre;
+        document.getElementById('personaje-jugador').innerHTML = personaje;
         this.personajeEnemigo = this.seleccionarEnemigoAleatorio();
-        document.getElementById('personaje-enemigo').innerHTML = this.personajeEnemigo.nombre;
+        document.getElementById('personaje-enemigo').innerHTML = this.personajeEnemigo;
 
         document.getElementById('seleccionar-personaje').style.display = 'none';
         document.getElementById('seleccion-ataque').style.display = 'block';
-        this.actualizarImagenesPersonajes(personaje, this.personajeEnemigo);
+        this.actualizarImagenesPersonajes();
     },
 
     // Selecciona el ataque del jugador
@@ -88,24 +86,29 @@ const juego = {
 
     // Selecciona un personaje enemigo aleatorio
     seleccionarEnemigoAleatorio() {
-        return avatares[Math.floor(Math.random() * avatares.length)];
+        const personajes = ['Zuko', 'Katara', 'Aang', 'Toph', 'Azula', 'Iroh', 'Suki', 'Sokka'];
+        return personajes[Math.floor(Math.random() * personajes.length)];
     },
 
     // Obtiene el personaje seleccionado por el jugador
     obtenerPersonajeSeleccionado() {
-        for (let personaje of avatares) {
-            const inputPersonaje = document.getElementById(personaje.nombre.toLowerCase());
+        const personajes = ['zuko', 'katara', 'aang', 'toph', 'azula', 'iroh', 'suki', 'sokka'];
+        for (let personaje of personajes) {
+            const inputPersonaje = document.getElementById(personaje);
             if (inputPersonaje.checked) {
-                return personaje;
+                return inputPersonaje.id.charAt(0).toUpperCase() + inputPersonaje.id.slice(1);
             }
         }
         return null;
     },
 
     // Actualiza las imágenes de los personajes en la interfaz
-    actualizarImagenesPersonajes(personajeJugador, personajeEnemigo) {
-        document.getElementById('imagen-personaje-jugador').src = personajeJugador.imagen;
-        document.getElementById('imagen-personaje-enemigo').src = personajeEnemigo.imagen;
+    actualizarImagenesPersonajes() {
+        const personajeJugador = document.getElementById('personaje-jugador').textContent.toLowerCase();
+        const personajeEnemigo = this.personajeEnemigo.toLowerCase();
+
+        document.getElementById('imagen-personaje-jugador').src = `imagenes/${personajeJugador}.png`;
+        document.getElementById('imagen-personaje-enemigo').src = `imagenes/${personajeEnemigo}.png`;
     },
 
     // Maneja la lógica del combate
@@ -169,7 +172,18 @@ const juego = {
         this.mostrarMensaje('', mensaje);
         document.getElementById('seleccion-ataque').style.display = 'none';
         document.getElementById('reiniciar').style.display = 'block';
+
+        // Mostrar el mensaje de resultado
+        const mensajeResultado = document.getElementById('mensaje-resultado');
+        mensajeResultado.textContent = mensaje; // Mensaje de ganaste o perdiste
+        mensajeResultado.style.display = 'block';
+
+        // Mostrar la pregunta de reinicio
+        const mensajeReinicio = document.getElementById('mensaje-reinicio');
+        mensajeReinicio.textContent = '¿Deseas volver a jugar?';
+        mensajeReinicio.style.display = 'block';
     },
+
 
     // Reinicia el estado del juego
     reiniciarJuego() {
