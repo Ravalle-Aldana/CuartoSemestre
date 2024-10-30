@@ -42,7 +42,7 @@ export const actualizarTareas = async (req, res) => {
         });
     }
 
-    return res.json(result.rowCount[0]);
+    return res.json(result.rows[0]);
 };
 
 export const eliminarTareas = async (req, res) => {
